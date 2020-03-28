@@ -11,8 +11,8 @@ export class Templates {
 				}/>
 			</div>
 			<div class="item-buttons">
-				<button class="item-buttons-edit">Edit</button>
-            	<button class="item-buttons-delete">Delete</button>
+				<button id = "btn_item-buttons-edit" class="item-buttons-edit">Edit</button>
+            	<button id = "btn_item-buttons-delete" class="item-buttons-delete">Delete</button>
 			</div>
         </div>
         `;
@@ -40,8 +40,8 @@ export class Templates {
 				<input type="date" name="dateLimitTask" id="dateLimit_Observable_edit" class="dateLimit_Observable" value = "${
 					itemVM.dateLimit_Observable
 				}" />
-				<button id="updateItem">Save</button>
-				<button id="cancelUpdateItem">Cancel</button>
+				<button id="btn_updateItem">Save</button>
+				<button id="btn_cancelUpdateItem">Cancel</button>
 			</form>
 		</div>`;
 		return htmlString;

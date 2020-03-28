@@ -1,5 +1,3 @@
-import $ from 'jquery';
-
 import Task from '../models/task.js';
 import Templates from '../templates/templates.js';
 
@@ -18,60 +16,79 @@ class ViewModel {
 
 	init() {
 		try {
-			this.bindElements();
+			this.bindElementsVanilla();
 			this.showTasks();
 		} catch (error) {
 			console.error(error);
 		}
 	}
 
-	bindElements() {
-		try {
-			$('#app').on('change paste keyup', '.title_Observable', e => {
-				this.title_Observable = $(e.target).val();
-			});
-			$('#app').on('change paste keyup', '.description_Observable', e => {
-				this.description_Observable = $(e.target).val();
-			});
-			$('#app').on('change paste keyup', '.dateLimit_Observable', e => {
-				this.dateLimit_Observable = $(e.target).val();
-			});
-			$('#app').on('change', '.isFinished_Observable', e => {
+	bindElementsVanilla() {
+		document.querySelector('#app').addEventListener('input', e => {
+			this.handleInputChange(e);
+		});
+		document.querySelector('#app').addEventListener('click', e => {
+			this.handleInputClick(e);
+		});
+	}
+
+	handleInputChange(e) {
+		switch (e.target.attributes.id.value) {
+			case 'title_Observable_create':
+				this.title_Observable = e.target.value;
+				break;
+			case 'description_Observable_create':
+				this.description_Observable = e.target.value;
+				break;
+			case 'isFinished_Observable_create':
 				this.isFinished_Observable = e.target.checked;
-			});
-			$('#add').on('click', e => {
+				break;
+			case 'dateLimit_Observable_create':
+				this.dateLimit_Observable = e.target.value;
+				break;
+			default:
+				break;
+		}
+	}
+
+	handleInputClick(e) {
+		switch (e.target.id) {
+			case 'isFinished_Observable_create':
+				this.handleInputChange(e);
+				break;
+			case 'dateLimit_Observable_create':
+				this.handleInputChange(e);
+				break;
+			case 'btn_add':
 				this.pushItems(this);
 				e.preventDefault();
-			});
-			$('#submit').on('click', e => {
+				break;
+			case 'btn_submit':
 				this.saveItems();
-			});
-			$('.list').on('click', '.item-buttons-edit', e => {
+				e.preventDefault();
+				break;
+			case 'btn_item-buttons-edit':
 				this.showEditForm(+e.target.parentElement.parentElement.attributes.key.value);
-			});
-			$('.list').on('click', '.item-buttons-delete', e => {
+				break;
+			case 'btn_item-buttons-delete':
 				this.deleteItem(+e.target.parentElement.parentElement.attributes.key.value);
-			});
-			$('#app').on('click', '#updateItem', e => {
+				break;
+			case 'btn_updateItem':
 				this.editItem(+e.target.parentElement.parentElement.attributes.key.value, this);
-				e.preventDefault();
-			});
-			$('#app').on('click', '#cancelUpdateItem', e => {
-				this.removeHtml('.modalForm');
-				e.preventDefault();
-			});
-		} catch (error) {
-			console.error(error);
+				break;
+			case 'btn_cancelUpdateItem':
+				this.removeHtml('modalForm');
+				break;
 		}
 	}
 
 	async showTasks() {
 		try {
-			this.removeHtml('.item');
+			this.removeHtml('item');
 			arrayVM = await tsk.fromDBToView();
 			arrayVM.forEach((itemVM, index) => {
 				const listItem = tmp.createListItemVM(index, itemVM);
-				this.renderItem('.list', listItem);
+				this.renderItem('list_show', listItem);
 			});
 		} catch (error) {
 			console.error(error);
@@ -80,7 +97,7 @@ class ViewModel {
 
 	renderItem(fatherId, childItemHtmlString) {
 		try {
-			$(fatherId).append(childItemHtmlString);
+			document.getElementById(fatherId).innerHTML += childItemHtmlString;
 		} catch (error) {
 			console.error(error);
 		}
@@ -88,7 +105,14 @@ class ViewModel {
 
 	removeHtml(idTag) {
 		try {
-			$(idTag).remove();
+			if (document.getElementById(idTag) != null) {
+				document.getElementById(idTag).remove();
+			} else {
+				let items = document.getElementsByClassName(idTag);
+				while (items.length > 0) {
+					items[0].parentNode.removeChild(items[0]);
+				}
+			}
 		} catch (error) {
 			console.error(error);
 		}
@@ -126,7 +150,7 @@ class ViewModel {
 		try {
 			const item = new ViewModel(obj);
 			await tsk.editTask(idItem, item);
-			this.removeHtml('.modalForm');
+			this.removeHtml('modalForm');
 			this.showTasks();
 		} catch (error) {
 			console.error(error);
@@ -139,7 +163,7 @@ class ViewModel {
 			arrayVM = await tsk.fromDBToView();
 			const itemVM = arrayVM[idItem];
 			const htmlEditForm = tmp.createEditFormVM(idItem, itemVM);
-			this.renderItem('#app', htmlEditForm);
+			this.renderItem('app', htmlEditForm);
 		} catch (error) {
 			console.error(error);
 		}
